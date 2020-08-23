@@ -4,6 +4,10 @@
 
 Kotlin main kts script helper
 
+## How to use
+
+See [examples](script.main.kts)
+
 ## License
 
 [Apache 2.0 License](LICENSE.txt)
