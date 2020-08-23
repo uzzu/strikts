@@ -1,9 +1,10 @@
 import com.jfrog.bintray.gradle.BintrayExtension
+import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
 
 plugins {
-
     id("org.jetbrains.kotlin.jvm") version "1.4.0"
     `java-library`
+    id("org.jlleitschuh.gradle.ktlint") version "9.3.0"
     `maven-publish`
     id("com.jfrog.bintray") version "1.8.5"
 }
@@ -28,6 +29,16 @@ tasks {
     }
     compileTestKotlin {
         kotlinOptions.jvmTarget = "1.8"
+    }
+}
+
+ktlint {
+    debug.set(true)
+    verbose.set(true)
+    outputToConsole.set(true)
+    ignoreFailures.set(true)
+    reporters {
+        reporter(ReporterType.CHECKSTYLE)
     }
 }
 

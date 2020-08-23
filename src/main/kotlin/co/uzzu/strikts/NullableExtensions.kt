@@ -23,4 +23,3 @@ fun <T : Any> T?.requireNotNull(): T =
  */
 fun <T : Any> T?.requireNotNull(lazyMessage: (() -> String)): T =
     requireNotNull(this, lazyMessage)
-
