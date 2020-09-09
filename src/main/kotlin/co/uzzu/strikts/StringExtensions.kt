@@ -11,6 +11,7 @@ import java.util.stream.Stream
  * Execute shell command
  * @return stdout
  */
+@Suppress("BlockingMethodInNonBlockingContext")
 suspend fun String.exec(): String {
     val commands = this.trim().split("\\s".toRegex())
     val process = ProcessBuilder(*commands.toTypedArray())
@@ -22,9 +23,6 @@ suspend fun String.exec(): String {
         }
         InputStreamReader(process.inputStream).use { it.readText() }
     } finally {
-        process.errorStream.close()
-        process.inputStream.close()
-        process.outputStream.close()
         process.destroyForcibly()
     }
 }
