@@ -9,7 +9,7 @@ and this project adheres to [semantic versioning](http://semver.org/).
 
 ## Added
 
-- `co.uzzu.strikts.DotEnv` class it supports `.env` file. Please see more examples.
+- `co.uzzu.strikts.DotEnv` class it supports `.env` file. Please see the [examples](examples/script.main.kts).
 
 ## Changed
 

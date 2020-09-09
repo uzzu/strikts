@@ -6,7 +6,7 @@ Kotlin main kts script helper
 
 ## How to use
 
-See [examples](script.main.kts)
+See [examples](examples/script.main.kts)
 
 ## License
 
