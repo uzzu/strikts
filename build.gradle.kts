@@ -1,12 +1,14 @@
-import com.jfrog.bintray.gradle.BintrayExtension
+import org.jetbrains.dokka.gradle.DokkaTask
 import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
 
 plugins {
-    id("org.jetbrains.kotlin.jvm") version "1.4.0"
+    id("co.uzzu.dotenv.gradle") version "1.1.0"
+    kotlin("jvm") version "1.4.0"
     `java-library`
-    id("org.jlleitschuh.gradle.ktlint") version "9.3.0"
+    id("org.jetbrains.dokka") version "1.4.0"
+    id("org.jlleitschuh.gradle.ktlint") version "9.4.0"
     `maven-publish`
-    id("com.jfrog.bintray") version "1.8.5"
+    signing
 }
 
 repositories {
@@ -15,7 +17,7 @@ repositories {
 
 dependencies {
     testImplementation("org.jetbrains.kotlin:kotlin-test")
-    testImplementation("org.jetbrains.kotlin:kotlin-test-junit")
+    testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
 }
 
 java {
@@ -46,6 +48,12 @@ val sourcesJar by tasks.creating(Jar::class) {
     archiveClassifier.set("sources")
     from(sourceSets.getByName("main").allSource)
 }
+val dokkaJavadoc = tasks.getByName("dokkaJavadoc", DokkaTask::class)
+val dokkaJar by tasks.creating(Jar::class) {
+    archiveClassifier.set("javadoc")
+    dependsOn(dokkaJavadoc)
+    from(dokkaJavadoc.outputDirectory)
+}
 
 group = publishingGroupId
 version = publishingArtifactVersion
@@ -54,8 +62,13 @@ setProperty("archivesBaseName", publishingArtifactId)
 publishing {
     repositories {
         maven {
-            name = "bintray"
-            url = uri("https://api.bintray.com/content/$bintrayUser/${Bintray.repo}/${Bintray.packageName}/$publishingArtifactVersion;override=1;publish=0") // ktlint-disable max-line-length
+            url = env.PUBLISH_PRODUCTION.orNull()
+                ?.run { uri("https://oss.sonatype.org/service/local/staging/deploy/maven2") }
+                ?: uri("https://oss.sonatype.org/content/repositories/snapshots")
+            credentials {
+                username = env.OSSRH_USERNAME.orElse("")
+                password = env.OSSRH_PASSWORD.orElse("")
+            }
         }
     }
 
@@ -64,8 +77,10 @@ publishing {
             from(components.getByName("java"))
             groupId = publishingGroupId
             artifactId = publishingArtifactId
-            version = publishingArtifactVersion
+            version = publishingArtifactVersion(env.PUBLISH_PRODUCTION.isPresent)
+
             artifact(sourcesJar)
+            artifact(dokkaJar)
 
             pom {
                 name.set(publishingArtifactId)
@@ -94,34 +109,16 @@ publishing {
     }
 }
 
-bintray {
-    user = bintrayUser
-    key = bintrayApiKey
-    publish = false
-    setPublications(
-        *publishing.publications
-            .withType<MavenPublication>()
-            .map { it.name }
-            .toTypedArray()
-    )
-    pkg(
-        delegateClosureOf<BintrayExtension.PackageConfig> {
-            repo = Bintray.repo
-            name = Bintray.packageName
-            desc = Bintray.desc
-            userOrg = Bintray.userOrg
-            websiteUrl = Bintray.websiteUrl
-            vcsUrl = Bintray.vcsUrl
-            issueTrackerUrl = Bintray.issueTrackerUrl
-            githubRepo = Bintray.githubRepo
-            githubReleaseNotesFile = Bintray.githubReleaseNoteFile
-            setLabels(* Bintray.labels)
-            setLicenses(*Bintray.licenses)
-            version(
-                delegateClosureOf<BintrayExtension.VersionConfig> {
-                    name = publishingArtifactVersion
-                }
-            )
-        }
-    )
+signing {
+    if (env.PUBLISH_PRODUCTION.isPresent) {
+        setRequired { gradle.taskGraph.hasTask("publish") }
+        sign(publishing.publications)
+
+        @Suppress("UnstableApiUsage")
+        useInMemoryPgpKeys(
+            env.SIGNING_KEYID.orElse(""),
+            env.SIGNING_KEY.orElse(""),
+            env.SIGNING_PASSOWORD.orElse("")
+        )
+    }
 }

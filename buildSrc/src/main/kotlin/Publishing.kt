@@ -1,8 +1,8 @@
 import org.gradle.api.Project
 
 private const val majorVersion: Int = 0
-private const val minorVersion: Int = 1
-private val patchVersion = 1
+private const val minorVersion: Int = 2
+private const val patchVersion: Int = 0
 
 val Project.publishingGroupId: String
     get() = "co.uzzu.strikts"
@@ -12,6 +12,13 @@ val Project.publishingArtifactId: String
 
 val Project.publishingArtifactVersion: String
     get() = "$majorVersion.$minorVersion.$patchVersion"
+
+fun Project.publishingArtifactVersion(isPublishProduction: Boolean): String =
+    if (isPublishProduction) {
+        publishingArtifactVersion
+    } else {
+        "$publishingArtifactVersion-SNAPSHOT"
+    }
 
 object MavenPublications {
     const val description = "kotlin-main-kts helpers"
@@ -24,25 +31,4 @@ object MavenPublications {
     const val organization = developersId
     const val organizationUrl = "https://uzzu.co"
     const val scmUrl = "https://github.com/uzzu/strikts"
-}
-
-val Project.bintrayUser: String?
-    get() = findProperty("bintrayUser") as String?
-val Project.bintrayApiKey: String?
-    get() = findProperty("bintrayApiKey") as String?
-
-object Bintray {
-    const val mavenUrl = "https://dl.bintray.com/uzzu/maven"
-    const val repo = "maven"
-    const val packageName = "strikts"
-    const val desc = MavenPublications.description
-    const val userOrg = MavenPublications.organization
-    const val websiteUrl = MavenPublications.url
-    const val issueTrackerUrl = "https://github.com/uzzu/strikts/issues"
-    const val vcsUrl = "https://github.com/uzzu/strikts"
-    const val githubRepo = "uzzu/strikts"
-    const val githubReleaseNoteFile = "CHANGELOG.md"
-    val licenses = arrayOf("Apache-2.0")
-    val labels = arrayOf("Kotlin")
-    val publicDownloadNumbers = true
 }
