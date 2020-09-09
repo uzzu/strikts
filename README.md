@@ -1,6 +1,6 @@
-# ~~Strikts~~
+[![Coding Style][ktlint-img]][ktlint] [![Released Version][maven-img]][maven]
 
-![](https://github.com/uzzu/strikts/workflows/master/badge.svg) [![ktlint](https://img.shields.io/badge/code%20style-%E2%9D%A4-FF4081.svg)](https://ktlint.github.io/) [![Download](https://api.bintray.com/packages/uzzu/maven/strikts/images/download.svg)](https://bintray.com/uzzu/maven/strikts/_latestVersion)
+# ~~Strikts~~
 
 Kotlin main kts script helper
 
@@ -11,3 +11,8 @@ See [examples](script.main.kts)
 ## License
 
 [Apache 2.0 License](LICENSE.txt)
+
+[ktlint-img]: https://img.shields.io/badge/code%20style-%E2%9D%A4-FF4081.svg
+[ktlint]: https://ktlint.github.io/
+[maven-img]: https://img.shields.io/maven-central/v/co.uzzu.strikts/strikts.svg?maxAge=2000
+[maven]: https://search.maven.org/search?q=g:co.uzzu.strikts
